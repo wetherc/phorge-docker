@@ -16,8 +16,6 @@ If you have a custom version of Phorge with patches, you can change the Git URLs
 - `OVERRIDE_PHORGE_BRANCH` - Changes the Git branch or commit to use for the Phorge repository.
 - `OVERRIDE_ARCANIST_URI` - Changes the Git URI to clone Arcanist from.
 - `OVERRIDE_ARCANIST_BRANCH` - Changes the Git branch or commit to use for the Arcanist repository.
-- `OVERRIDE_LIBPHUTIL_URI` - Changes the Git URI to clone libphutil from.
-- `OVERRIDE_LIBPHUTIL_BRANCH` - Changes the Git branch or commit to use for the libphutil repository.
 
 For example:
 
@@ -38,25 +36,6 @@ At various stages of the boot process, you can run custom scripts to insert addi
 - `SCRIPT_BEFORE_DAEMONS` - Occurs before background daemons are launched.
 - `SCRIPT_AFTER_DAEMONS` - Occurs after background daemons are launched.  You can use this to launch additional daemons.
 
-For example, if you wanted to add an external libphutil library, you might configure the image like this:
-
-```
-docker run ... \
-    --env SCRIPT_BEFORE_MIGRATION=/scripts/beforemig.sh \
-    -v /hostscripts:/scripts \
-    ...
-```
-
-Then inside `/hostscripts` on the host you'd have the following executable shell script:
-
-```
-#!/bin/bash
-
-git clone https://github.com/mycompany/my-extension /srv/phorge/my-extension
-cd /srv/phorge/phorge
-sudo -u "$PHORGE_VCS_USER" ./bin/config set load-libraries '["/srv/phorge/my-extension"]'
-```
-
 # Baking configuration into an image
 
 You can bake the configuration and initial start-up of this image into your own derived image.  The benefits of doing this are:
@@ -67,7 +46,7 @@ You can bake the configuration and initial start-up of this image into your own 
 To bake an image, create a `Dockerfile` like this:
 
 ```
-FROM redpointgames/phorge
+FROM phorge
 
 ADD my-script /my-script
 RUN /my-script

@@ -3,9 +3,9 @@ services:
   phorge:
     restart: always
     ports:
-     - "62443:443"
-     - "62080:80"
-     - "62022:22"
+     - "443:443"
+     - "80:80"
+     - "22:22"
     volumes:
      - /srv/docker/phorge/repos:/repos
     depends_on:

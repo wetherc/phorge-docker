@@ -19,7 +19,6 @@ mv run-iomonitor.sh /app/run-iomonitor.sh
 mv 10-boot-conf /app/startup/10-boot-conf
 
 mv php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf.template
-mv php.ini /etc/php/8.3/fpm/php.ini
 
 mv supervisord.conf /app/supervisord.conf
 mv init.sh /app/init.sh

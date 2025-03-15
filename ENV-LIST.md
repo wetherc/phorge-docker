@@ -21,10 +21,6 @@
 - `ENABLE_APCU` - Enable the APCu extension for PHP.  This may improve performance, but is not as stable as regular PHP.
 - `ENABLE_UPDATE_ON_START` - By default this image uses the version of Phorge baked into the image when it was made.  By setting this to "true", it will fetch the latest version of Phorge when the image starts.
 - `SSL_TYPE` - One of "none", "manual", "external" or "letsencrypt".  See [Basic Configuration](BASIC-CONFIG.md) for more information (defaults to "none").
-- `SSL_CERTIFICATE` - The path to the SSL certificate chain (manual mode only).
-- `SSL_PRIVATE_KEY` - The path to the SSL private key (manual mode only).
-- `SSL_EMAIL` - The email address to use when registering for an SSL certificate (Let's Encrypt mode only)
-- `SSL_DOMAINS` - An optional comma seperated list of the domains to issue for, in addition to `PHORGE_HOST` (Let's Encrypt mode only)
 - `DISABLE_IOMONITOR` - Disable the I/O monitor, which warns if the image is spending a lot of CPU time waiting on disk I/O.
 
 The following advanced options automatically turn on `ENABLE_UPDATE_ON_START`:
@@ -33,8 +29,6 @@ The following advanced options automatically turn on `ENABLE_UPDATE_ON_START`:
 - `OVERRIDE_PHORGE_BRANCH` - Changes the Git branch or commit to use for the Phorge repository.
 - `OVERRIDE_ARCANIST_URI` - Changes the Git URI to clone Arcanist from.
 - `OVERRIDE_ARCANIST_BRANCH` - Changes the Git branch or commit to use for the Arcanist repository.
-- `OVERRIDE_LIBPHUTIL_URI` - Changes the Git URI to clone libphutil from.
-- `OVERRIDE_LIBPHUTIL_BRANCH` - Changes the Git branch or commit to use for the libphutil repository.
 
 The following advanced options allow you to run custom scripts during stages of the boot process:
 

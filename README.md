@@ -15,16 +15,14 @@ docker run \
     --env MYSQL_PASS=pass \
     --env PHORGE_REPOSITORY_PATH=/repos \
     -v /host/repo/path:/repos \
-    redpointgames/phorge
+    phorge
 ```
 
-Alternatively you can launch this image with Docker Compose. Refer to [Using Docker Compose](https://github.com/RedpointGames/phorge/blob/master/DOCKER-COMPOSE.md) for more information.
-
-**NOTICE:** This repository has been recently moved to `RedpointGames/phorge` and the Docker image to use is now `redpointgames/phorge`.  `hachque/phorge` will be kept in sync with `redpointgames/phorge` for the foreseeable future, so you don't need to update your configuration immediately.
+Alternatively you can launch this image with Docker Compose. Refer to [Using Docker Compose](./DOCKER-COMPOSE.md) for more information.
 
 ## Configuration
 
-For basic configuration in getting the image running, refer to [Basic Configuration](https://github.com/RedpointGames/phorge/blob/master/BASIC-CONFIG.md).
+For basic configuration in getting the image running, refer to [Basic Configuration](./BASIC-CONFIG.md).
 
 For more advanced configuration topics including:
 
@@ -32,7 +30,7 @@ For more advanced configuration topics including:
 * Running custom commands during the boot process, and
 * Baking configuration into your own derived Docker image
 
-refer to [Advanced Configuration](https://github.com/RedpointGames/phorge/blob/master/ADVANCED-CONFIG.md).
+refer to [Advanced Configuration](./ADVANCED-CONFIG.md).
 
 For users that are upgrading to this version and currently using the old `/config` mechanism to configure Phorge, this configuration mechanism will continue to work, but it's recommended that you migrate to environment variables or baked images when you next get the chance.
 
@@ -40,7 +38,7 @@ For users that are upgrading to this version and currently using the old `/confi
 
 For issues regarding environment setup, missing tools or parts of the image not starting correctly, file a GitHub issue.
 
-For issues encountered while using Phorge itself, report the issue with reproduction steps on the [upstream bug tracker](https://secure.phorge.com/book/phabcontrib/article/bug_reports/).
+For issues encountered while using Phorge itself, report the issue with reproduction steps on the [upstream bug tracker](https://we.phorge.it/book/contrib/article/bug_reports/).
 
 ## License
 

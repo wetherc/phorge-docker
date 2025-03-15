@@ -42,9 +42,7 @@ fi
 if [ "$OVERRIDE_PHORGE_URI" != "" ] ||
    [ "$OVERRIDE_PHORGE_BRANCH" != "" ] ||
    [ "$OVERRIDE_ARCANIST_URI" != "" ] ||
-   [ "$OVERRIDE_ARCANIST_BRANCH" != "" ] ||
-   [ "$OVERRIDE_LIBPHUTIL_URI" != "" ] ||
-   [ "$OVERRIDE_LIBPHUTIL_BRANCH" != "" ]; then
+   [ "$OVERRIDE_ARCANIST_BRANCH" != "" ]; then
   ENABLE_UPDATE_ON_START=true
 fi
 
@@ -64,10 +62,6 @@ if [ -f /config/script.phd ]; then
   SCRIPT_AFTER_DAEMONS=/config/script.phd
 fi
 
-if [ "$TLS_LB_TERMINATED" == "" ]; then
-  TLS_LB_TERMINATED=false
-fi
-
 if [ -d /config/keycache ]; then
   PHORGE_HOST_KEYS_PATH="/config/keycache"
 fi
@@ -78,8 +72,6 @@ OVERRIDE_PHORGE_URI="$OVERRIDE_PHORGE_URI"
 OVERRIDE_PHORGE_BRANCH="$OVERRIDE_PHORGE_BRANCH"
 OVERRIDE_ARCANIST_URI="$OVERRIDE_ARCANIST_URI"
 OVERRIDE_ARCANIST_BRANCH="$OVERRIDE_ARCANIST_BRANCH"
-OVERRIDE_LIBPHUTIL_URI="$OVERRIDE_LIBPHUTIL_URI"
-OVERRIDE_LIBPHUTIL_BRANCH="$OVERRIDE_LIBPHUTIL_BRANCH"
 PHORGE_HOST="$PHORGE_HOST"
 PHORGE_CDN="$PHORGE_CDN"
 PHORGE_REPOSITORY_PATH="$PHORGE_REPOSITORY_PATH"
@@ -107,7 +99,6 @@ SCRIPT_AFTER_MIGRATION="$SCRIPT_AFTER_MIGRATION"
 SCRIPT_AFTER_LETS_ENCRYPT="$SCRIPT_AFTER_LETS_ENCRYPT"
 SCRIPT_BEFORE_DAEMONS="$SCRIPT_BEFORE_DAEMONS"
 SCRIPT_AFTER_DAEMONS="$SCRIPT_AFTER_DAEMONS"
-TLS_LB_TERMINATED="$TLS_LB_TERMINATED"
 DISABLE_IOMONITOR="$DISABLE_IOMONITOR"
 EOF
 set -x
@@ -121,7 +112,7 @@ sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/phorge-ssh/sshd_config.phorg
 sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/phorge-ssh/phorge-ssh-hook.sh.template > /etc/phorge-ssh/phorge-ssh-hook.sh
 
 # TODO: probably don't hardcode the major/minor version...
-sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/php5/fpm/php-fpm.conf.template > /etc/php/8.3/fpm/php-fpm.conf
+sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/php/8.3/fpm/php-fpm.conf.template > /etc/php/8.3/fpm/php-fpm.conf
 chmod 755 /etc/phorge-ssh/phorge-ssh-hook.sh
 
 # Set up Phorge
@@ -132,18 +123,6 @@ if [ "$SCRIPT_BEFORE_UPDATE" != "" ]; then
 fi
 
 if [ "$ENABLE_UPDATE_ON_START" == "true" ]; then
-  pushd /srv/phorge/libphutil
-  if [ "$OVERRIDE_LIBPHUTIL_URI" != "" ]; then
-    sudo -u "$PHORGE_VCS_USER" git remote set-url origin $OVERRIDE_LIBPHUTIL_URI
-  fi
-  sudo -u "$PHORGE_VCS_USER" git fetch --all
-  if [ "$OVERRIDE_LIBPHUTIL_BRANCH" != "" ]; then
-    sudo -u "$PHORGE_VCS_USER" git checkout $OVERRIDE_LIBPHUTIL_BRANCH
-  else
-    sudo -u "$PHORGE_VCS_USER" git pull
-  fi
-  popd
-
   pushd /srv/phorge/arcanist
   if [ "$OVERRIDE_ARCANIST_URI" != "" ]; then
     sudo -u "$PHORGE_VCS_USER" git remote set-url origin $OVERRIDE_ARCANIST_URI
@@ -189,9 +168,9 @@ if [ "$MYSQL_STORAGE_NAMESPACE" != "" ]; then
 fi
 if [ "$PHORGE_HOST" != "" ]; then
   if [ "$SSL_TYPE" == "none" ]; then
-    sudo -u "$PHORGE_VCS_USER" ./bin/config set phorge.base-uri "http://$PHORGE_HOST/"
+    sudo -u "$PHORGE_VCS_USER" ./bin/config set phabricator.base-uri "http://$PHORGE_HOST/"
   else
-    sudo -u "$PHORGE_VCS_USER" ./bin/config set phorge.base-uri "https://$PHORGE_HOST/"
+    sudo -u "$PHORGE_VCS_USER" ./bin/config set phabricator.base-uri "https://$PHORGE_HOST/"
   fi
 fi
 if [ "$PHORGE_CDN" != "" ]; then
@@ -251,7 +230,7 @@ extension=apcu.so
 EOF
 fi
 
-if [ "$TLS_LB_TERMINATED" == "true" ]; then
+if [ "$SSL_TYPE" == "external" ]; then
   sudo -u $PHORGE_VCS_USER cat << 'EOF' >/srv/phorge/phorge/support/preamble.php
 <?php
 

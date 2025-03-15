@@ -35,6 +35,7 @@ apt-get install -y \
   php-dev \
   php-curl \
   php-fileinfo \
+  php-fpm \
   php-gd \
   php-iconv \
   php-json \
@@ -53,8 +54,8 @@ apt-get install -y \
 php -v
 php -m
 
-sed -i "s/;opcache.validate_timestamps=1/opcache.validate_timestamps=0/g" /etc/php/8.*/fpm/php.ini
-sed -i "s/post_max_size = 8M/post_max_size = 32M/g" /etc/php/8.*/fpm/php.ini
+sed -i "s/;opcache.validate_timestamps=1/opcache.validate_timestamps=0/g" /etc/php/8.3/fpm/php.ini
+sed -i "s/post_max_size = 8M/post_max_size = 32M/g" /etc/php/8.3/fpm/php.ini
 
 ########################################
 # node
@@ -66,13 +67,13 @@ npm install -g ws
 # Additional dependencies
 ########################################
 apt-get install -y \
-  supervisor \
+  cron \
   imagemagick \
+  ldap-utils \
   mariadb-client \
   nginx \
-  cron \
   python3-pygments \
-  ldap-utils
+  supervisor
 
 ########################################
 # Create users
@@ -97,9 +98,9 @@ npm install -prefix /srv/phorge/phorge/support/aphlict/server/node_modules ws
 git config --system --add safe.directory /srv/phorge/arcanist
 git config --system --add safe.directory /srv/phorge/phorge
 
-chown -R phorge:wwwgrp-phorge /srv/phorge
+chown -R PHORGE:wwwgrp-phorge /srv/phorge
 
 mkdir -p /repos
-chown -R phorge:wwwgrp-phorge /repos
+chown -R PHORGE:wwwgrp-phorge /repos
 
 cd /

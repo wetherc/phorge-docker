@@ -40,6 +40,8 @@ docker run ... \
     ...
 ```
 
+By default, Phorge will run on `phorge.localhost`; if you would like to test it locally you should edit your hosts file to resolve this address.
+
 It's recommended that you specify an alternate domain to serve files and other user content from.  This will make Phorge more secure.  You can configure this using the `PHORGE_CDN` option, like so:
 
 ```
@@ -47,8 +49,6 @@ docker run ... \
     --env PHORGE_CDN=altdomain.com \
     ...
 ```
-
-When using the Let's Encrypt SSL configuration, it will automatically register both domains.
 
 You also need to configure a place to store repository data.  This should be a volume mapped from the host, for example:
 
@@ -93,7 +93,7 @@ docker run ... \
 
 # Configuring SSL
 
-You can configure SSL in one of three ways: you can omit it entirely, you can turn on the automatic Let's Encrypt registration or you can provide SSL certificates.
+You can configure SSL in one way: you can omit it entirely. I don't feel like testing LetsEncrypt setup tonight. This will change eventually.
 
 ## No SSL
 
@@ -101,41 +101,10 @@ This is the default.  If you provide no SSL related options, this image doesn't 
 
 ## Load Balancer terminated SSL
 
-If your load balancer is terminating SSL, you should set `SSL_TYPE` to `external` so that Phorge will render out all links as HTTPS.  Without doing this (i.e. if you left the default of `none`), all of the Phorge URLs would be prefixed with `http://` instead of `https://`.
-
-**NOTE:** If you use Load Balancer terminated SSL, things like real-time notifications are unlikely to work correctly.  It's recommended that you let the Docker instance terminate the SSL connection, and use TCP forwarding in any load balancer configuration you might have set up.
+This is an actual, supported second option. If your load balancer is terminating SSL, you should set `SSL_TYPE` to `external` so that Phorge will render out all links as HTTPS.  Without doing this (i.e. if you left the default of `none`), all of the Phorge URLs would be prefixed with `http://` instead of `https://`.
 
 ```
 docker run ... \
     --env SSL_TYPE=external \
-    ...
-```
-
-## Automatic SSL via Let's Encrypt
-
-For this to work, you need to provide a volume mapped to `/config`, so that the image can store certificates across restarts.  You also need to set `PHORGE_HOST` and optionally `PHORGE_CDN` as documented above.
-
-To enable automated SSL via Let's Encrypt, provide the following environment variables:
-
-```
-docker run ... \
-    --env SSL_TYPE=letsencrypt \
-    --env SSL_EMAIL='youremail@domain.com' \
-    --env PHORGE_HOST=myphorge.com \
-    --env PHORGE_CDN=altdomain.com \
-    -v /some/host/path:/config \
-    ...
-```
-
-## Manual SSL
-
-If you want to provide your own certificates, map a volume containing your certificates and set the appropriate environment variables:
-
-```
-docker run ... \
-    --env SSL_TYPE=manual \
-    --env SSL_CERTIFICATE=/ssl/cert.pem \
-    --env SSL_PRIVATE_KEY=/ssl/cert.key \
-    -v /host/folder/containing/certs:/ssl \
     ...
 ```

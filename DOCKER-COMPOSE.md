@@ -2,7 +2,7 @@
 
 Docker Compose configuration file supplied in this repository defines a Phorge service and a MySQL service.
 
-The MySQL service uses official MySQL Docker image mysql:5.7.14 and the Phorge service uses image redpointgames/phorge.
+The MySQL service uses official Mariadb Docker image mariadb:latest and the Phorge service assumes that you have built a phorge image yourself with `docker build -t phorge .`.
 
 
 ## Configure `PHORGE_HOST`
@@ -14,10 +14,6 @@ If you do not modify the `PHORGE_HOST`, Phorge will not function correctly.
 ## Docker Volume
 
 By default, it tries to mount host directory /srv/docker/phorge/mysql as /var/lib/mysql in MySQL service container and host directory /srv/docker/phorge/repos as /repo in Phorge service container.
-
-It mounts host directory /srv/docker/phorge/extensions as /srv/phorge/phorge/src/extensions in Phorge service.
-
-If you would like to add additional translations for phorge, you can just drop php files in host directory /srv/docker/phorge/extensions.
 
 To ensure that MySQL database and code repositories are both persistent, please make sure the following directories exist in your docker host.
 

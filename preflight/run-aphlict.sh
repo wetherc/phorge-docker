@@ -9,13 +9,13 @@ source /config.saved
 if [ ! -f /baked ]; then
   # Touch log file and PID file to make sure they're writable
   touch /var/log/aphlict.log
-  chown "$PHABRICATOR_VCS_USER:wwwgrp-phabricator" /var/log/aphlict.log
+  chown "$PHORGE_VCS_USER:wwwgrp-phorge" /var/log/aphlict.log
 
   # Copy ws module from global install
-  cp -Rv /usr/lib/node_modules /srv/phabricator/phabricator/support/aphlict/server/
-  chown -Rv "$PHABRICATOR_VCS_USER:wwwgrp-phabricator" /srv/phabricator/phabricator/support/aphlict/server/node_modules
+  cp -Rv /usr/lib/node_modules /srv/phorge/phorge/support/aphlict/server/
+  chown -Rv "$PHORGE_VCS_USER:wwwgrp-phorge" /srv/phorge/phorge/support/aphlict/server/node_modules
 
-  # Configure the Phabricator notification server
+  # Configure the Phorge notification server
   cat >/srv/aphlict.conf <<EOF
 {
   "servers": [
@@ -50,9 +50,9 @@ EOF
 fi
 
 if [ ! -f /is-baking ]; then
-  # Start the Phabricator notification server
-  pushd /srv/phabricator/phabricator
-  sudo -u "$PHABRICATOR_VCS_USER" bin/aphlict start --config=/srv/aphlict.conf
+  # Start the Phorge notification server
+  pushd /srv/phorge/phorge
+  sudo -u "$PHORGE_VCS_USER" bin/aphlict start --config=/srv/aphlict.conf
   popd
 
   set +e

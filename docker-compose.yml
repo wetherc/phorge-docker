@@ -1,14 +1,13 @@
 version: '2'
 services:
-  phabricator:
+  phorge:
     restart: always
     ports:
      - "62443:443"
      - "62080:80"
      - "62022:22"
     volumes:
-     - /srv/docker/phabricator/repos:/repos
-     - /srv/docker/phabricator/extensions:/srv/phabricator/phabricator/src/extensions
+     - /srv/docker/phorge/repos:/repos
     depends_on:
      - mysql
     links:
@@ -16,14 +15,14 @@ services:
     environment:
      - MYSQL_HOST=mysql
      - MYSQL_USER=root
-     - MYSQL_PASS=phabricator
-     - PHABRICATOR_REPOSITORY_PATH=/repos
-     - PHABRICATOR_HOST=myphabricator.com
-    image: redpointgames/phabricator
+     - MYSQL_PASS=phorge
+     - PHORGE_REPOSITORY_PATH=/repos
+     - PHORGE_HOST=phorge.localhost
+    image: phorge
   mysql:
     restart: always
     volumes:
-     - /srv/docker/phabricator/mysql:/var/lib/mysql
-    image: mysql:5.7.14
+     - /srv/docker/phorge/mysql:/var/lib/mariadb
+    image: mariadb:latest
     environment:
-     - MYSQL_ROOT_PASSWORD=phabricator
+     - MYSQL_ROOT_PASSWORD=phorge

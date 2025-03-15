@@ -1,6 +1,6 @@
 # Basic Configuration
 
-For most basic setups, you can use environment variables to configure the Phabricator image to your liking.  This works well with tools like `docker-compose`.
+For most basic setups, you can use environment variables to configure the Phorge image to your liking.  This works well with tools like `docker-compose`.
 
 A full list of all available environment variables can be found in the [Full Environment Variable List](ENV-LIST.md).
 
@@ -11,7 +11,7 @@ You need to do this before running the container, or things won't work.  If you 
 ```
 docker run ... \
     --env MYSQL_HOST=mysql \
-    --env MYSQL_USER=phabricator \
+    --env MYSQL_USER=phorge \
     --env MYSQL_PASS=password \
     --link somecontainer:mysql \
     ...
@@ -23,28 +23,28 @@ If your instance of MySQL is running on the host or some external system, you ca
 docker run \
     --env MYSQL_HOST=externalhost.com \
     --env MYSQL_PORT=3306 \
-    --env MYSQL_USER=phabricator \
+    --env MYSQL_USER=phorge \
     --env MYSQL_PASS=password \
     ...
 ```
 
 The `MYSQL_PORT` environment variable is set to a sensible default, so normally you don't need to explicitly provide it.
 
-# Configuring Phabricator
+# Configuring Phorge
 
-Phabricator needs some basic information about how clients will connect to it.  You can provide the base URI for Phabricator with the `PHABRICATOR_HOST` environment variable, like so:
+Phorge needs some basic information about how clients will connect to it.  You can provide the base URI for Phorge with the `PHORGE_HOST` environment variable, like so:
 
 ```
 docker run ... \
-    --env PHABRICATOR_HOST=myphabricator.com \
+    --env PHORGE_HOST=myphorge.com \
     ...
 ```
 
-It's recommended that you specify an alternate domain to serve files and other user content from.  This will make Phabricator more secure.  You can configure this using the `PHABRICATOR_CDN` option, like so:
+It's recommended that you specify an alternate domain to serve files and other user content from.  This will make Phorge more secure.  You can configure this using the `PHORGE_CDN` option, like so:
 
 ```
 docker run ... \
-    --env PHABRICATOR_CDN=altdomain.com \
+    --env PHORGE_CDN=altdomain.com \
     ...
 ```
 
@@ -54,7 +54,7 @@ You also need to configure a place to store repository data.  This should be a v
 
 ```
 docker run ... \
-    --env PHABRICATOR_REPOSITORY_PATH=/repos \
+    --env PHORGE_REPOSITORY_PATH=/repos \
     -v /path/on/host:/repos \
     ...
 ```
@@ -63,19 +63,19 @@ To provide SSH access to repositories, you need to set a path to store the SSH h
 
 ```
 docker run ... \
-    --env PHABRICATOR_HOST_KEYS_PATH=/hostkeys/persisted \
+    --env PHORGE_HOST_KEYS_PATH=/hostkeys/persisted \
     -v /path/on/host:/hostkeys \
     ...
 ```
 
-By default, Phabricator stores file data in MySQL.  You can change this with the `PHABRICATOR_STORAGE_TYPE` option, which can be either `mysql` (the default), `disk` or `s3`.
+By default, Phorge stores file data in MySQL.  You can change this with the `PHORGE_STORAGE_TYPE` option, which can be either `mysql` (the default), `disk` or `s3`.
 
-You can configure Phabricator to store files on disk by selecting the `disk` option, mapping a volume and configuring the path:
+You can configure Phorge to store files on disk by selecting the `disk` option, mapping a volume and configuring the path:
 
 ```
 docker run ... \
-    --env PHABRICATOR_STORAGE_TYPE=disk \
-    --env PHABRICATOR_STORAGE_PATH=/files \
+    --env PHORGE_STORAGE_TYPE=disk \
+    --env PHORGE_STORAGE_PATH=/files \
     -v /path/on/host:/files \
     ...
 ```
@@ -84,8 +84,8 @@ Alternatively if you want to store file data in S3, you can do so by selecting t
 
 ```
 docker run ... \
-    --env PHABRICATOR_STORAGE_TYPE=s3 \
-    --env PHABRICATOR_STORAGE_BUCKET=mybucket \
+    --env PHORGE_STORAGE_TYPE=s3 \
+    --env PHORGE_STORAGE_BUCKET=mybucket \
     --env AWS_S3_ACCESS_KEY=... \
     --env AWS_S3_SECRET_KEY=... \
     ...
@@ -101,7 +101,7 @@ This is the default.  If you provide no SSL related options, this image doesn't 
 
 ## Load Balancer terminated SSL
 
-If your load balancer is terminating SSL, you should set `SSL_TYPE` to `external` so that Phabricator will render out all links as HTTPS.  Without doing this (i.e. if you left the default of `none`), all of the Phabricator URLs would be prefixed with `http://` instead of `https://`.
+If your load balancer is terminating SSL, you should set `SSL_TYPE` to `external` so that Phorge will render out all links as HTTPS.  Without doing this (i.e. if you left the default of `none`), all of the Phorge URLs would be prefixed with `http://` instead of `https://`.
 
 **NOTE:** If you use Load Balancer terminated SSL, things like real-time notifications are unlikely to work correctly.  It's recommended that you let the Docker instance terminate the SSL connection, and use TCP forwarding in any load balancer configuration you might have set up.
 
@@ -113,7 +113,7 @@ docker run ... \
 
 ## Automatic SSL via Let's Encrypt
 
-For this to work, you need to provide a volume mapped to `/config`, so that the image can store certificates across restarts.  You also need to set `PHABRICATOR_HOST` and optionally `PHABRICATOR_CDN` as documented above.
+For this to work, you need to provide a volume mapped to `/config`, so that the image can store certificates across restarts.  You also need to set `PHORGE_HOST` and optionally `PHORGE_CDN` as documented above.
 
 To enable automated SSL via Let's Encrypt, provide the following environment variables:
 
@@ -121,8 +121,8 @@ To enable automated SSL via Let's Encrypt, provide the following environment var
 docker run ... \
     --env SSL_TYPE=letsencrypt \
     --env SSL_EMAIL='youremail@domain.com' \
-    --env PHABRICATOR_HOST=myphabricator.com \
-    --env PHABRICATOR_CDN=altdomain.com \
+    --env PHORGE_HOST=myphorge.com \
+    --env PHORGE_CDN=altdomain.com \
     -v /some/host/path:/config \
     ...
 ```

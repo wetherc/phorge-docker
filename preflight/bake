@@ -6,7 +6,7 @@
 #
 # Usage:
 #
-# FROM redpointgames/phabricator
+# FROM redpointgames/phorge
 #
 # ADD my-script /my-script
 # RUN /my-script

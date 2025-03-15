@@ -44,17 +44,17 @@ zypper --non-interactive install -f cronie
 # Create users and groups
 echo "nginx:x:497:495:user for nginx:/var/lib/nginx:/bin/false" >> /etc/passwd
 echo "nginx:!:495:" >> /etc/group
-echo "PHABRICATOR:x:2000:2000:user for phabricator:/srv/phabricator:/bin/bash" >> /etc/passwd
-echo "wwwgrp-phabricator:!:2000:nginx" >> /etc/group
+echo "PHORGE:x:2000:2000:user for phorge:/srv/phorge:/bin/bash" >> /etc/passwd
+echo "wwwgrp-phorge:!:2000:nginx" >> /etc/group
 
-# Set up the Phabricator code base
-mkdir /srv/phabricator
-chown PHABRICATOR:wwwgrp-phabricator /srv/phabricator
-cd /srv/phabricator
-sudo -u PHABRICATOR git clone https://www.github.com/phacility/libphutil.git /srv/phabricator/libphutil
-sudo -u PHABRICATOR git clone https://www.github.com/phacility/arcanist.git /srv/phabricator/arcanist
-sudo -u PHABRICATOR git clone https://www.github.com/phacility/phabricator.git /srv/phabricator/phabricator
-sudo -u PHABRICATOR git clone https://www.github.com/PHPOffice/PHPExcel.git /srv/phabricator/PHPExcel
+# Set up the Phorge code base
+mkdir /srv/phorge
+chown PHORGE:wwwgrp-phorge /srv/phorge
+cd /srv/phorge
+sudo -u PHORGE git clone https://www.github.com/phacility/libphutil.git /srv/phorge/libphutil
+sudo -u PHORGE git clone https://www.github.com/phacility/arcanist.git /srv/phorge/arcanist
+sudo -u PHORGE git clone https://www.github.com/phacility/phorge.git /srv/phorge/phorge
+sudo -u PHORGE git clone https://www.github.com/PHPOffice/PHPExcel.git /srv/phorge/PHPExcel
 cd /
 
 # Clone Let's Encrypt

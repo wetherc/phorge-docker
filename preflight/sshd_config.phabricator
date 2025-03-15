@@ -3,8 +3,8 @@
 
 # NOTE: Edit these to the correct values for your setup.
 
-AuthorizedKeysCommand /etc/phabricator-ssh/phabricator-ssh-hook.sh
-AuthorizedKeysCommandUser __PHABRICATOR_VCS_USER__
+AuthorizedKeysCommand /etc/phorge-ssh/phorge-ssh-hook.sh
+AuthorizedKeysCommandUser __PHORGE_VCS_USER__
 
 # You may need to tweak these options, but mostly they just turn off everything
 # dangerous.
@@ -20,5 +20,5 @@ PasswordAuthentication no
 AuthorizedKeysFile none
 UseDNS no
 
-PidFile /run/sshd-phabricator.pid
+PidFile /run/sshd-phorge.pid
 

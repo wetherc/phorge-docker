@@ -5,17 +5,17 @@ if [ ! -f /is-baking ]; then
   source /config.saved
 
   if [ "$SCRIPT_BEFORE_DAEMONS" != "" ]; then
-    pushd /srv/phabricator/phabricator
+    pushd /srv/phorge/phorge
     $SCRIPT_BEFORE_DAEMONS
     popd
   fi
 
-  # Start the Phabricator daemons
-  pushd /srv/phabricator/phabricator
-  sudo -u "$PHABRICATOR_VCS_USER" bin/phd restart --force
+  # Start the Phorge daemons
+  pushd /srv/phorge/phorge
+  sudo -u "$PHORGE_VCS_USER" bin/phd restart --force
 
   if [ "$SCRIPT_AFTER_DAEMONS" != "" ]; then
-    pushd /srv/phabricator/phabricator
+    pushd /srv/phorge/phorge
     $SCRIPT_AFTER_DAEMONS
     popd
   fi

@@ -44,12 +44,12 @@ elif [ "$SSL_TYPE" == "manual" ]; then
 elif [ "$SSL_TYPE" == "external" ]; then
   if [ ! -f /baked ]; then
     # Add the HTTPS PHP preamble when using SSL terminating reverse proxy 
-    touch /srv/phabricator/phabricator/support/preamble.php
-    chown $PHABRICATOR_VCS_USER:wwwgrp-phabricator /srv/phabricator/phabricator/support/preamble.php
-    chmod a+x /srv/phabricator/phabricator/support/preamble.php
+    touch /srv/phorge/phorge/support/preamble.php
+    chown $PHORGE_VCS_USER:wwwgrp-phorge /srv/phorge/phorge/support/preamble.php
+    chmod a+x /srv/phorge/phorge/support/preamble.php
 
     echo "<?php
 
-    \$_SERVER['HTTPS'] = true;" > /srv/phabricator/phabricator/support/preamble.php
+    \$_SERVER['HTTPS'] = true;" > /srv/phorge/phorge/support/preamble.php
   fi
 fi

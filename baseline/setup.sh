@@ -1,64 +1,105 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 set -x
 
-# Add repositories
-zypper --non-interactive ar http://download.opensuse.org/repositories/devel:/languages:/php/openSUSE_Leap_42.3/ php
-zypper --non-interactive ar http://download.opensuse.org/repositories/home:/marec2000:/nodejs/openSUSE_Leap_42.3/ nodejs
-zypper --non-interactive ar http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Leap_42.3/ python
+export DEBIAN_FRONTEND=noninteractive
 
-# Install Git before we add the SCM repository (the SCM repository contains Git 2.11, which is broken).
-zypper --gpg-auto-import-keys --non-interactive in --force-resolution git
+########################################
+# system utils
+########################################
+apt-get update
+apt-get upgrade -y
 
-# Lock the git package to the current version
-zypper --non-interactive al git
+apt-get install -y \
+  autoconf \
+  ca-certificates \
+  curl \
+  gcc \
+  git \
+  gnupg \
+  make \
+  libc-dev \
+  lsb-release \
+  pkg-config \
+  sudo
 
-# Test to make sure we're not running Git 2.11, otherwise, abort the image bake right now (this prevents
-# bad images from being pushed to the index).
-if [ "$(git --version)" == *"2.11"* ]; then
-  echo "Bad version of Git detected: $(git --version).  Aborting image creation!"
-  exit 1
-fi
+########################################
+# php
+########################################
+apt-get install -y php
+apt-get install -y \
+  php-apcu \
+  php-bcmath \
+  php-ctype \
+  php-dev \
+  php-curl \
+  php-fileinfo \
+  php-gd \
+  php-iconv \
+  php-json \
+  php-ldap \
+  php-mbstring \
+  php-mysql \
+  php-opcache \
+  php-pear \
+  php-posix \
+  php-sockets \
+  php-xml \
+  php-xmlwriter \
+  php-zip
 
-# Add SCM package for other tools (Subversion, Mercurial)...
-zypper --non-interactive ar http://download.opensuse.org/repositories/devel:/tools:/scm/openSUSE_Leap_42.3/ scm
+# Verify installation and modules
+php -v
+php -m
 
-# Install requirements
-zypper --gpg-auto-import-keys --non-interactive in --force-resolution nginx php-fpm php5-mbstring php5-mysql php5-curl php5-pcntl php5-gd php5-openssl php5-ldap php5-fileinfo php5-posix php5-json php5-iconv php5-ctype php5-zip php5-sockets which python3-Pygments nodejs ca-certificates ca-certificates-mozilla ca-certificates-cacert sudo subversion mercurial php5-xmlwriter nodejs-ws php5-opcache ImageMagick postfix glibc-locale supervisor
+sed -i "s/;opcache.validate_timestamps=1/opcache.validate_timestamps=0/g" /etc/php/8.*/fpm/php.ini
+sed -i "s/post_max_size = 8M/post_max_size = 32M/g" /etc/php/8.*/fpm/php.ini
 
-# Build and install APCu
-zypper --non-interactive install --force-resolution autoconf automake binutils cpp cpp48 gcc gcc48 glibc-devel libasan0 libatomic1 libcloog-isl4 libgomp1 libisl10 libitm1 libltdl7 libmpc3 libmpfr4 libpcre16-0 libpcrecpp0 libpcreposix0 libstdc++-devel libstdc++48-devel libtool libtsan0 libxml2-devel libxml2-tools linux-glibc-devel m4 make ncurses-devel pcre-devel php5-devel php5-pear php5-zlib pkg-config readline-devel tack xz-devel zlib-devel
-printf "\n" | pecl install apcu-4.0.10
-#zypper --non-interactive remove --force-resolution autoconf automake binutils cpp cpp48 gcc gcc48 glibc-devel libasan0 libatomic1 libcloog-isl4 libgomp1 libisl10 libitm1 libltdl7 libmpc3 libmpfr4 libpcre16-0 libpcrecpp0 libpcreposix0 libstdc++-devel libstdc++48-devel libtool libtsan0 libxml2-devel libxml2-tools linux-glibc-devel m4 ncurses-devel pcre-devel php5-devel php5-pear pkg-config readline-devel tack xz-devel zlib-devel
+########################################
+# node
+########################################
+apt-get install -y nodejs npm
+npm install -g ws
 
-# Remove cached things that pecl left in /tmp/
-rm -rf /tmp/*
+########################################
+# Additional dependencies
+########################################
+apt-get install -y \
+  supervisor \
+  imagemagick \
+  mariadb-client \
+  nginx \
+  cron \
+  python3-pygments \
+  ldap-utils
 
-# Install a few extra things
-zypper --non-interactive install --force-resolution mariadb-client vim vim-data
-
-# Force reinstall cronie
-zypper --non-interactive install -f cronie
-
-# Create users and groups
+########################################
+# Create users
+########################################
 echo "nginx:x:497:495:user for nginx:/var/lib/nginx:/bin/false" >> /etc/passwd
 echo "nginx:!:495:" >> /etc/group
 echo "PHORGE:x:2000:2000:user for phorge:/srv/phorge:/bin/bash" >> /etc/passwd
 echo "wwwgrp-phorge:!:2000:nginx" >> /etc/group
 
-# Set up the Phorge code base
+########################################
+# Download phorge
+########################################
 mkdir /srv/phorge
-chown PHORGE:wwwgrp-phorge /srv/phorge
 cd /srv/phorge
-sudo -u PHORGE git clone https://www.github.com/phacility/libphutil.git /srv/phorge/libphutil
-sudo -u PHORGE git clone https://www.github.com/phacility/arcanist.git /srv/phorge/arcanist
-sudo -u PHORGE git clone https://www.github.com/phacility/phorge.git /srv/phorge/phorge
-sudo -u PHORGE git clone https://www.github.com/PHPOffice/PHPExcel.git /srv/phorge/PHPExcel
-cd /
 
-# Clone Let's Encrypt
-git clone https://github.com/letsencrypt/letsencrypt /srv/letsencrypt
-cd /srv/letsencrypt
-./letsencrypt-auto-source/letsencrypt-auto --help
+git clone https://we.phorge.it/source/arcanist.git /srv/phorge/arcanist
+git clone https://we.phorge.it/source/phorge.git /srv/phorge/phorge
+
+mkdir -p /srv/phorge/phorge/support/aphlict/server/node_modules
+npm install -prefix /srv/phorge/phorge/support/aphlict/server/node_modules ws
+
+git config --system --add safe.directory /srv/phorge/arcanist
+git config --system --add safe.directory /srv/phorge/phorge
+
+chown -R phorge:wwwgrp-phorge /srv/phorge
+
+mkdir -p /repos
+chown -R phorge:wwwgrp-phorge /repos
+
 cd /

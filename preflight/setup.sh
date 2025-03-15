@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 set -x
@@ -9,25 +9,17 @@ mkdir /app/startup
 cd /preflight
 
 mv nginx.conf /app/nginx.conf
-mv nginx.ssl.conf /app/nginx.ssl.conf
-mv server-https-letsencrypt.conf /app/disabled-server-https-letsencrypt.conf
-mv server-https-manual.conf /app/disabled-server-https-manual.conf
-
 mv fastcgi.conf /app/fastcgi.conf
 
 mv run-phd.sh /app/run-phd.sh
 mv run-ssh.sh /app/run-ssh.sh
 mv run-aphlict.sh /app/run-aphlict.sh
 mv run-iomonitor.sh /app/run-iomonitor.sh
-mv run-postfix.sh /app/run-postfix.sh
-
-mv letsencrypt.sh /app/letsencrypt.sh
 
 mv 10-boot-conf /app/startup/10-boot-conf
-mv 15-https-conf /app/startup/15-https-conf
 
-mv php-fpm.conf /etc/php5/fpm/php-fpm.conf.template
-mv php.ini /etc/php5/fpm/php.ini
+mv php-fpm.conf /etc/php/8.3/fpm/php-fpm.conf.template
+mv php.ini /etc/php/8.3/fpm/php.ini
 
 mv supervisord.conf /app/supervisord.conf
 mv init.sh /app/init.sh
@@ -44,18 +36,10 @@ cd /
 ls /preflight
 rmdir /preflight # This should now be empty; it's an error if it's not.
 
-# Install PHPExcel
-echo '' >> /etc/php5/fpm/php-fpm.conf
-echo 'php_value[include_path] = "/srv/phorge/PHPExcel/Classes"' >> /etc/php5/fpm/php-fpm.conf
-
-# Move the default SSH to port 24
+# Move the default SSH to port 2222
 echo "" >> /etc/ssh/sshd_config
-echo "Port 24" >> /etc/ssh/sshd_config
+echo "Port 2222" >> /etc/ssh/sshd_config
 
 # Configure Phorge SSH service
 chown root:root /etc/phorge-ssh/*
-
-# Workaround for https://gist.github.com/porjo/35ea98cb64553c0c718a
-chmod u+s /usr/sbin/postdrop
-chmod u+s /usr/sbin/postqueue
 

@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 set -x
 
 # Source configuration
 source /config.saved
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 if [ ! -f /baked ]; then
   # Touch log file and PID file to make sure they're writable

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # NOTE: Replace this with the username that you expect users to connect with.
 VCSUSER="__PHORGE_VCS_USER__"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script bakes a derived Docker container from this container
 # with all of the required configuration.  This makes your derived
@@ -32,7 +32,6 @@ set -x
 touch /is-baking
 
 /app/startup/10-boot-conf
-/app/startup/15-https-conf
 
 touch /baked
 rm /is-baking

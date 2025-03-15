@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Occasionally parsing Git diffs may consume all disk I/O
 # on a server, impacting other services including the web

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 set -x
@@ -64,19 +64,8 @@ if [ -f /config/script.phd ]; then
   SCRIPT_AFTER_DAEMONS=/config/script.phd
 fi
 
-if [ -f /config/script.letsencrypt ]; then
-  SCRIPT_AFTER_LETS_ENCRYPT=/config/script.letsencrypt
-fi
-
-if [ -f /config/letsencrypt.config ]; then 
-  . /config/letsencrypt.config
-  if [ "$LETS_ENCRYPT" == "true" ]; then
-    SSL_TYPE="letsencrypt"
-    SSL_EMAIL="$LETS_ENCRYPT_EMAIL"
-    if [ "$PHORGE_HOST" == "" ]; then
-      PHORGE_HOST="$LETS_ENCRYPT_DOMAIN"
-    fi
-  fi
+if [ "$TLS_LB_TERMINATED" == "" ]; then
+  TLS_LB_TERMINATED=false
 fi
 
 if [ -d /config/keycache ]; then
@@ -112,16 +101,13 @@ MYSQL_STORAGE_NAMESPACE="$MYSQL_STORAGE_NAMESPACE"
 ENABLE_APCU="$ENABLE_APCU"
 ENABLE_UPDATE_ON_START="$ENABLE_UPDATE_ON_START"
 SSL_TYPE="$SSL_TYPE"
-SSL_CERTIFICATE="$SSL_CERTIFICATE"
-SSL_PRIVATE_KEY="$SSL_PRIVATE_KEY"
-SSL_EMAIL="$SSL_EMAIL"
-SSL_DOMAINS="$SSL_DOMAINS"
 SCRIPT_BEFORE_UPDATE="$SCRIPT_BEFORE_UPDATE"
 SCRIPT_BEFORE_MIGRATION="$SCRIPT_BEFORE_MIGRATION"
 SCRIPT_AFTER_MIGRATION="$SCRIPT_AFTER_MIGRATION"
 SCRIPT_AFTER_LETS_ENCRYPT="$SCRIPT_AFTER_LETS_ENCRYPT"
 SCRIPT_BEFORE_DAEMONS="$SCRIPT_BEFORE_DAEMONS"
 SCRIPT_AFTER_DAEMONS="$SCRIPT_AFTER_DAEMONS"
+TLS_LB_TERMINATED="$TLS_LB_TERMINATED"
 DISABLE_IOMONITOR="$DISABLE_IOMONITOR"
 EOF
 set -x
@@ -133,7 +119,9 @@ source /config.saved
 sed -i "s/PHORGE/$PHORGE_VCS_USER/g" /etc/passwd
 sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/phorge-ssh/sshd_config.phorge.template > /etc/phorge-ssh/sshd_config.phorge
 sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/phorge-ssh/phorge-ssh-hook.sh.template > /etc/phorge-ssh/phorge-ssh-hook.sh
-sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/php5/fpm/php-fpm.conf.template > /etc/php5/fpm/php-fpm.conf
+
+# TODO: probably don't hardcode the major/minor version...
+sed "s/__PHORGE_VCS_USER__/$PHORGE_VCS_USER/g" /etc/php5/fpm/php-fpm.conf.template > /etc/php/8.3/fpm/php-fpm.conf
 chmod 755 /etc/phorge-ssh/phorge-ssh-hook.sh
 
 # Set up Phorge
@@ -258,8 +246,16 @@ unset APHLICT_PORT
 popd
 
 if [ "$ENABLE_APCU" == "true" ]; then
-  cat >/etc/php5/conf.d/apcu.ini <<EOF
+  cat >/etc/php/8.3/conf.d/apcu.ini <<EOF
 extension=apcu.so
+EOF
+fi
+
+if [ "$TLS_LB_TERMINATED" == "true" ]; then
+  sudo -u $PHORGE_VCS_USER cat << 'EOF' >/srv/phorge/phorge/support/preamble.php
+<?php
+
+$_SERVER['HTTPS'] = true;
 EOF
 fi
 
